@@ -1,5 +1,4 @@
-﻿using System.Net.Security;
-using System.Text;
+﻿using System.Text;
 
 namespace OOPTask1
 {
@@ -7,15 +6,18 @@ namespace OOPTask1
     {
         public abstract string FileExtension { get; }
 
-        public const string FILE_EXTENSION = ".csv";
+        private const string TARGET_FILE_EXTENSION = "csv";
+        private const char SPLIT_CHAR = ';';
         public bool IsFilling => _isFilling;
         
         private bool _isFilling = false;
         private FileStream _csvStream = null;
+        protected long wordsCount = 0;
+        private Dictionary<string, long> _words = new(128);
 
-        protected abstract void Parse(string filename);
+        public abstract void Parse(string filename);
 
-        protected bool StartFilling(string filename)
+        protected virtual bool StartFilling(string filename)
         {
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentNullException(nameof(filename));
@@ -25,14 +27,52 @@ namespace OOPTask1
 
             var filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
 
-            _csvStream = new FileStream($"{filenameWithoutExtension}.{FILE_EXTENSION}", FileMode.Create, FileAccess.Write);
+            _csvStream = new FileStream($"{filenameWithoutExtension}.{TARGET_FILE_EXTENSION}", FileMode.Create, FileAccess.Write);
 
             _isFilling = true;
 
             return true;
         }
 
-        protected bool Fill(string text, int frequency, int frequencyInPerc)
+        protected virtual void RecordWord(string word)
+        {
+            (bool hasWord, long? count) = TryGetWordCount(word);
+
+            if (hasWord && count.HasValue)
+                _words[word] = count.Value + 1;
+            else
+                _words[word] = 1;
+
+            wordsCount++;
+        }
+
+        protected virtual (bool hasWord, long? count) TryGetWordCount(string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                throw new ArgumentNullException(nameof(word));
+
+            var hasWord = _words.TryGetValue(word, out long count);
+            return (hasWord, hasWord ? count : null);
+        }
+
+        protected virtual void FillAllWords(bool sorted)
+        {
+            if (sorted)
+                SortWords();
+
+            foreach (var pair in _words)
+            {
+                var frequency = (double)pair.Value / wordsCount;
+                Fill(pair.Key, frequency, frequency * 100);
+            }
+        }
+
+        protected virtual void SortWords()
+        {
+            _words = _words.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        protected virtual bool Fill(string text, double frequency, double frequencyInPerc)
         {
             if (string.IsNullOrEmpty(text))
                 throw new ArgumentNullException(nameof(text));
@@ -40,21 +80,25 @@ namespace OOPTask1
             if (!IsFilling)
                 return false;
 
-            var validCharacters = text.Any(c => !char.IsLetterOrDigit(c));
+            var invalidCharacters = text.Any(char.IsLetterOrDigit);
 
-            if (!validCharacters)
+            if (!invalidCharacters)
                 return false;
 
-            var line = $"{text},{frequency},{frequencyInPerc}";
-            var data = Encoding.UTF8.GetBytes(line);
+            var frequencyText = frequency.ToString("0.0000").Replace(',', '.');
+            var frequencyInPercText = frequencyInPerc.ToString("0.000").Replace(',', '.');
+            var line = $"{text}{SPLIT_CHAR}{frequencyText}{SPLIT_CHAR}{frequencyInPercText}%";
+            var data = Encoding.UTF8.GetBytes(line + Environment.NewLine);
 
             _csvStream.Write(data, 0, data.Length);
             _csvStream.Flush();
 
+            Logger.Log($"Сделана запись '{line}'");
+
             return true;
         }
 
-        protected bool StopFilling()
+        protected virtual bool StopFilling()
         {
             if (!_isFilling)
                 return false;

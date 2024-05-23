@@ -1,32 +1,33 @@
-﻿using OOPTask1.Parsers;
+﻿using OOPTask1.Loggers;
+using OOPTask1.Parsers;
 
 namespace OOPTask1
 {
     public class Program
     {
-        public static readonly ParserBase[] Parsers = new[]
-        {
-            new TXTParser()
-        };
-
         private static void Main(string[] args)
         {
-            if (args.Length == 0)
-                return;
+            args = new string[] { "StringBuilder.txt" };
 
-            var filePath = args[0];
-            var fileExtension = Path.GetExtension(filePath);
+            Logger.Register(new ConsoleLogger());
+            Logger.Initialize();
 
-            if (!File.Exists(filePath))
-                return;
+            Logger.Log("Программа запущена.");
 
-            var parser = Parsers.FirstOrDefault(p => p.FileExtension.Equals(fileExtension));
+            if (args.Length != 0)
+            {
+                var filePath = args[0];
 
-            if (parser is null)
-                return;
+                var parsingManager = new ParsingManager();
+                parsingManager.Register<TXTParser>();
+                parsingManager.Execute(filePath);
+            }
+            else
+            {
+                Logger.Log("Не заданы аргументы!", LogLevel.Warning);
+            }    
 
-            char.IsLetterOrDigit();
-
+            Logger.Log("Программа завершена.");
             Console.ReadLine();
         }
     }

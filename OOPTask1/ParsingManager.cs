@@ -1,9 +1,16 @@
 ﻿namespace OOPTask1
 {
+    /// <summary>
+    /// Система с различными анализаторами текста
+    /// </summary>
     public class ParsingManager : IParsingManager
     {
         private readonly List<ParserBase> _parsers = new();
 
+        /// <summary>
+        /// Регистрация анализатора по типу
+        /// </summary>
+        /// <returns> Удалось ли зарегистрировать </returns>
         public bool Register<T>() where T : ParserBase, new()
         {
             if (_parsers.Any(p => p is T))
@@ -15,6 +22,10 @@
             return true;
         }
 
+        /// <summary>
+        /// Дерегистрация анализатора по типу
+        /// </summary>
+        /// <returns> Удалось ли дерегистрировать </returns>
         public bool Unregister<T>() where T : ParserBase, new()
         {
             var parser = _parsers.FirstOrDefault(p => p is T);
@@ -27,6 +38,11 @@
             return true;
         }
 
+        /// <summary>
+        /// Выполнить анализ
+        /// </summary>
+        /// <param name="filePath"> Путь до файла</param>
+        /// <returns></returns>
         public virtual bool Execute(string filePath)
         {
             try

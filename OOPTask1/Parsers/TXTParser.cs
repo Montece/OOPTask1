@@ -2,10 +2,15 @@
 
 namespace OOPTask1.Parsers
 {
+    /// <summary>
+    /// Реализация анализа текста файла txt
+    /// </summary>
     public class TXTParser : ParserBase
     {
+        /// <inheritdoc />
         public override string FileExtension => ".txt";
 
+        /// <inheritdoc />
         public override void Parse(string filename)
         {
             try

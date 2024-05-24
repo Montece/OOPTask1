@@ -1,5 +1,8 @@
 ﻿namespace OOPTask1
 {
+    /// <summary>
+    /// Уровни логгирования
+    /// </summary>
     public enum LogLevel : int
     {
         Debug = 0,

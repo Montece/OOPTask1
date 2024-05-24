@@ -7,7 +7,7 @@ namespace OOPTask1
     {
         private static void Main(string[] args)
         {
-            args = new string[] { "StringBuilder.txt" };
+            //args = new string[] { "StringBuilder.txt" }; <-- вынести в тест
 
             Logger.Register(new ConsoleLogger());
             Logger.Initialize();

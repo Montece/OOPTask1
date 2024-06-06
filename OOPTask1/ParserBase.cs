@@ -16,10 +16,7 @@ namespace OOPTask1
         /// Расширение файла для результатов анализа
         /// </summary>
         private const string TARGET_FILE_EXTENSION = "csv";
-        /// <summary>
-        /// Символ-разделитель параметров в строке результатов анализа
-        /// </summary>
-        private const char SPLIT_CHAR = ';';
+
         /// <summary>
         /// Выводится ли сейчас информация в файл
         /// </summary>
@@ -28,7 +25,7 @@ namespace OOPTask1
         private bool _isFilling = false;
         private FileStream _csvStream = null;
         protected long wordsCount = 0;
-        private Dictionary<string, long> _words = new(128);
+        private List<Record> _records = new(128);
 
         /// <summary>
         /// Анализ файла
@@ -50,7 +47,7 @@ namespace OOPTask1
             if (_isFilling)
                 return false;
 
-            var filenameWithoutExtension = Path.GetFileNameWithoutExtension(filename);
+            var filenameWithoutExtension = Path.Combine(Path.GetDirectoryName(filename), Path.GetFileNameWithoutExtension(filename));
 
             _csvStream = new FileStream($"{filenameWithoutExtension}.{TARGET_FILE_EXTENSION}", FileMode.Create, FileAccess.Write);
 
@@ -65,29 +62,34 @@ namespace OOPTask1
         /// <param name="word"> Слово </param>
         protected virtual void RecordWord(string word)
         {
-            (bool hasWord, long? count) = TryGetWordCount(word);
+            var record = TryGetWord(word);
 
-            if (hasWord && count.HasValue)
-                _words[word] = count.Value + 1;
+            if (record is null)
+            {
+                record = new Record(new(word), 1, 0);
+                _records.Add(record);
+            }
             else
-                _words[word] = 1;
+            {
+                record.Count++;
+            }
 
             wordsCount++;
         }
 
         /// <summary>
-        /// Попытка получить количество повторений для слова
+        /// Попытка получить запись о слове
         /// </summary>
         /// <param name="word"> Слово </param>
-        /// <returns> (Было ли уже такое слово, Количество слов) </returns>
+        /// <returns> Запись о слове </returns>
         /// <exception cref="ArgumentNullException" />
-        protected virtual (bool hasWord, long? count) TryGetWordCount(string word)
+        protected virtual Record? TryGetWord(string word)
         {
             if (string.IsNullOrEmpty(word))
                 throw new ArgumentNullException(nameof(word));
 
-            var hasWord = _words.TryGetValue(word, out long count);
-            return (hasWord, hasWord ? count : null);
+            var record = _records.Where(w => w.Word != null && w.Word.Value.Equals(word)).FirstOrDefault();
+            return record;
         }
 
         /// <summary>
@@ -99,10 +101,11 @@ namespace OOPTask1
             if (sorted)
                 SortWords();
 
-            foreach (var pair in _words)
+            foreach (var record in _records)
             {
-                var frequency = (double)pair.Value / wordsCount;
-                Fill(pair.Key, frequency, frequency * 100);
+                var frequency = (double)record.Count / wordsCount;
+                record.Frequency = frequency;
+                Fill(record);
             }
         }
 
@@ -111,7 +114,7 @@ namespace OOPTask1
         /// </summary>
         protected virtual void SortWords()
         {
-            _words = _words.OrderByDescending(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+            _records = _records.OrderByDescending(x => x.Frequency).ToList();
         }
 
         /// <summary>
@@ -122,23 +125,19 @@ namespace OOPTask1
         /// <param name="frequencyInPerc"> Частота появления слова (в %) </param>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        protected virtual bool Fill(string text, double frequency, double frequencyInPerc)
+        protected virtual bool Fill(Record record)
         {
-            if (string.IsNullOrEmpty(text))
-                throw new ArgumentNullException(nameof(text));
+            if (record is null || record.Word is null || string.IsNullOrEmpty(record.Word.Value))
+                throw new ArgumentNullException(nameof(record));
 
             if (!IsFilling)
                 return false;
 
-            var invalidCharacters = text.Any(char.IsLetterOrDigit);
-
-            if (!invalidCharacters)
+            if (!record.Word.IsValid())
                 return false;
 
-            var frequencyText = frequency.ToString("0.0000").Replace(',', '.');
-            var frequencyInPercText = frequencyInPerc.ToString("0.000").Replace(',', '.');
-            var line = $"{text}{SPLIT_CHAR}{frequencyText}{SPLIT_CHAR}{frequencyInPercText}%";
-            var data = Encoding.UTF8.GetBytes(line + Environment.NewLine);
+            var line = record.ToString() + Environment.NewLine;
+            var data = Encoding.UTF8.GetBytes(line);
 
             _csvStream.Write(data, 0, data.Length);
             _csvStream.Flush();

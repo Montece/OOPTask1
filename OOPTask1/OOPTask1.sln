@@ -5,7 +5,9 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOPTask1", "OOPTask1.csproj", "{4644504B-AFC4-47A3-B49B-4DE25337B160}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOPTask1.Tests", "..\OOPTask1.Tests\OOPTask1.Tests.csproj", "{0998DCC5-F618-497D-B93C-D6C3CC6C5F11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OOPTask1.Tests", "..\OOPTask1.Tests\OOPTask1.Tests.csproj", "{0998DCC5-F618-497D-B93C-D6C3CC6C5F11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OOPTask1.Console", "..\OOPTask1.Console\OOPTask1.Console.csproj", "{80F89B7F-5832-49D6-A083-6FD06E518DC6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{0998DCC5-F618-497D-B93C-D6C3CC6C5F11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0998DCC5-F618-497D-B93C-D6C3CC6C5F11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0998DCC5-F618-497D-B93C-D6C3CC6C5F11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80F89B7F-5832-49D6-A083-6FD06E518DC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80F89B7F-5832-49D6-A083-6FD06E518DC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80F89B7F-5832-49D6-A083-6FD06E518DC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80F89B7F-5832-49D6-A083-6FD06E518DC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

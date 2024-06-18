@@ -1,71 +1,73 @@
-﻿namespace OOPTask1
+﻿using NLog;
+using OOPTask1.Abstract;
+
+namespace OOPTask1
 {
     /// <summary>
     /// Система с различными анализаторами текста
     /// </summary>
-    public class ParsingManager : IParsingManager
+    public sealed class ParsingManager : IParsingManager
     {
-        private readonly List<ParserBase> _parsers = new();
+        protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+        private readonly List<TextFileParserBase> _parsers = new();
 
-        /// <summary>
-        /// Регистрация анализатора по типу
-        /// </summary>
-        /// <returns> Удалось ли зарегистрировать </returns>
-        public bool Register<T>() where T : ParserBase, new()
+        public bool Register(TextFileParserBase parser)
         {
-            if (_parsers.Any(p => p is T))
-                return false;
+            ArgumentNullException.ThrowIfNull(parser);
 
-            var parser = new T();
+            if (_parsers.Contains(parser))
+            {
+                return false;
+            }
+
             _parsers.Add(parser);
 
             return true;
         }
 
-        /// <summary>
-        /// Дерегистрация анализатора по типу
-        /// </summary>
-        /// <returns> Удалось ли дерегистрировать </returns>
-        public bool Unregister<T>() where T : ParserBase, new()
+        public bool Unregister(TextFileParserBase parser)
         {
-            var parser = _parsers.FirstOrDefault(p => p is T);
+            ArgumentNullException.ThrowIfNull(parser);
 
-            if (parser is null)
+            if (!_parsers.Contains(parser))
+            {
                 return false;
+            }
 
             _parsers.Remove(parser);
 
             return true;
         }
 
-        /// <summary>
-        /// Выполнить анализ
-        /// </summary>
-        /// <param name="filePath"> Путь до файла</param>
-        /// <returns></returns>
-        public virtual bool Execute(string filePath)
+        public bool Execute(FileInfo fileInfo)
         {
+            ArgumentNullException.ThrowIfNull(fileInfo);
+
             try
             {
-                if (!File.Exists(filePath))
+                if (string.IsNullOrEmpty(fileInfo.Extension))
                 {
-                    Logger.Log($"Файл по пути '{filePath}' не существует!", LogLevel.Warning);
+                    throw new ArgumentException("File doesn't have extension", nameof(fileInfo));
+                }
+
+                var fileExtension = fileInfo.Extension.Substring(1);
+                var parsers = _parsers.Where(p => p.FileExtension.Equals(fileExtension)).ToList();
+
+                if (parsers.Count == 0)
+                {
                     return false;
-                }  
+                }
 
-                var fileExtension = Path.GetExtension(filePath);
-                var parser = _parsers.FirstOrDefault(p => p.FileExtension.Equals(fileExtension));
-
-                if (parser is null)
-                    return false;
-
-                parser.Parse(filePath);
+                foreach (var parser in parsers)
+                {
+                    parser.Execute(fileInfo);
+                }
 
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.Log(ex.ToString(), LogLevel.Error);
+                _logger.Error(ex);
                 return false;
             }
         }

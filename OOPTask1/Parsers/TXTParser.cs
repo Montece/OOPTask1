@@ -1,61 +1,62 @@
-﻿using System.Text;
+﻿using OOPTask1.Model;
+using System.Text;
 
 namespace OOPTask1.Parsers
 {
     /// <summary>
     /// Реализация анализа текста файла txt
     /// </summary>
-    public class TXTParser : ParserBase
+    public sealed class TXTParser : TextFileParserBase
     {
         /// <inheritdoc />
-        public override string FileExtension => ".txt";
+        public override string FileExtension => "txt";
 
         /// <inheritdoc />
-        public override void Parse(string filename)
+        protected override void Parse(FileInfo textFile)
         {
-            try
+            using (var fs = new FileStream(textFile.FullName, FileMode.Open, FileAccess.Read))
             {
-                StartFilling(filename);
-
-                using (var fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
+                using (var sr = new StreamReader(fs))
                 {
-                    using (var sr = new StreamReader(fs))
+                    var sb = new StringBuilder();
+
+                    while (!sr.EndOfStream)
                     {
-                        var sb = new StringBuilder();
+                        var letterIndex = sr.Read();
 
-                        while (!sr.EndOfStream)
+                        if (letterIndex == -1)
                         {
-                            var letterIndex = sr.Read();
+                            break;
+                        }
 
-                            if (letterIndex == -1)
-                                break;
+                        var letter = (char)letterIndex;
 
-                            var letter = (char)letterIndex;
+                        if (char.IsControl(letter))
+                        {
+                            continue;
+                        }                 
 
-                            if (char.IsControl(letter))
-                                continue;
+                        if (!char.IsLetterOrDigit(letter))
+                        {
+                            var wordStr = sb.ToString();
 
-                            if (!char.IsLetterOrDigit(letter))
+                            if (!string.IsNullOrEmpty(wordStr))
                             {
-                                var word = sb.ToString();
+                                var word = new Word(wordStr);
+                                RecordWord(word);
+                            }   
 
-                                if (!string.IsNullOrEmpty(word))
-                                    RecordWord(word);
-
-                                sb.Clear();
-                            }
-                            else
-                                sb.Append(letter);
+                            sb.Clear();
+                        }
+                        else
+                        {
+                            sb.Append(letter);
                         }
                     }
                 }
+            }
 
-                FillAllWords(true);
-            }
-            finally
-            {
-                StopFilling();
-            }
+            FillAllWords(true);
         }
     }
 }

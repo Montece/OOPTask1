@@ -9,9 +9,9 @@ namespace OOPTask1
     public sealed class ParsingManager : IParsingManager
     {
         protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private readonly List<TextFileParserBase> _parsers = new();
+        private readonly List<FileParserBase> _parsers = new();
 
-        public bool Register(TextFileParserBase parser)
+        public bool Register(FileParserBase parser)
         {
             ArgumentNullException.ThrowIfNull(parser);
 
@@ -25,7 +25,7 @@ namespace OOPTask1
             return true;
         }
 
-        public bool Unregister(TextFileParserBase parser)
+        public bool Unregister(FileParserBase parser)
         {
             ArgumentNullException.ThrowIfNull(parser);
 

@@ -6,6 +6,31 @@ namespace OOPTask1.Tests
 {
     public class ParsingManagerTests
     {
+        [Fact]
+        public void Register_Success()
+        {
+            var parsingManager = new ParsingManager();
+            var txtParser = new TXTParser();
+            parsingManager.Register(txtParser);
+
+            var result = parsingManager.Execute(new FileInfo("StringBuilder.txt"));
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Unregister_Success()
+        {
+            var parsingManager = new ParsingManager();
+            var txtParser = new TXTParser();
+            parsingManager.Register(txtParser);
+            parsingManager.Unregister(txtParser);
+
+            var result = parsingManager.Execute(new FileInfo("StringBuilder.txt"));
+
+            Assert.False(result);
+        }
+
         [Theory]
         [InlineData(["StringBuilder.txt", "StringBuilder.csv", "StringBuilder;0.0216;2.165%"])]
         public void ExecuteTXTParserTest(string inputFilename, string outputFilename, string assertValue)

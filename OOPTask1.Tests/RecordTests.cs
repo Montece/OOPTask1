@@ -24,7 +24,7 @@ namespace OOPTask1.Tests
 
         [Theory]
         [InlineData(10, 0.1d)]
-        public void GetFrequency_GoodValue(ulong allWordsCount, ulong assertFrequency)
+        public void GetFrequency_GoodValue(ulong allWordsCount, double assertFrequency)
         {
             var word = new Word("test");
             var model = new Model.Record(word, 1);

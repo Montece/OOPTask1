@@ -6,7 +6,7 @@ namespace OOPTask1.Parsers
     /// <summary>
     /// Реализация анализа текста файла txt
     /// </summary>
-    public sealed class TXTParser : TextFileParserBase
+    public sealed class TXTParser : FileParserBase
     {
         /// <inheritdoc />
         public override string FileExtension => "txt";
@@ -43,7 +43,7 @@ namespace OOPTask1.Parsers
                             if (!string.IsNullOrEmpty(wordStr))
                             {
                                 var word = new Word(wordStr);
-                                RecordWord(word);
+                                AddWord(word);
                             }   
 
                             sb.Clear();
@@ -55,8 +55,6 @@ namespace OOPTask1.Parsers
                     }
                 }
             }
-
-            FillAllWords(true);
         }
     }
 }

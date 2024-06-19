@@ -34,5 +34,17 @@ namespace OOPTask1.Tests
         {
             Assert.Throws<ArgumentException>(() => new Word(wordStr));
         }
+
+        [Fact]
+        public void Equals_WordAndString()
+        {
+            var wordStr = "test";
+            var word = new Word(wordStr);
+
+            var condition0 = word.Equals(wordStr);
+            var condition1 = word.Equals(word);
+
+            Assert.True(condition0 && condition1);
+        }
     }
 }

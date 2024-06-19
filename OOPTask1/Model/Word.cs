@@ -32,6 +32,10 @@
             {
                 return word.Value.Equals(Value);
             }
+            else if (obj is string str)
+            {
+                return str.Equals(Value);
+            }
             else
             {
                 return false;

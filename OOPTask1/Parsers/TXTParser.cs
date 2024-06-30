@@ -5,10 +5,8 @@ namespace OOPTask1.Parsers;
 
 public sealed class TXTParser : FileParserBase
 {
-    /// <inheritdoc />
     public override string FileExtension => "txt";
 
-    /// <inheritdoc />
     protected override void Parse(FileInfo textFile)
     {
         using (var fs = new FileStream(textFile.FullName, FileMode.Open, FileAccess.Read))

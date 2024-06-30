@@ -8,7 +8,7 @@ namespace OOPTask1;
 /// </summary>
 public sealed class ParsingManager : IParsingManager
 {
-    protected static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly List<FileParserBase> _parsers = new();
 
     public bool Register(FileParserBase parser)

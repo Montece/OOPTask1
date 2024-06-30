@@ -1,44 +1,43 @@
 ﻿using NLog;
 using OOPTask1.Model;
 
-namespace OOPTask1
+namespace OOPTask1;
+
+/// <summary>
+/// Базовый класс конкретной реализации для анализа файла с текстом
+/// </summary>
+public abstract class FileParserBase
 {
     /// <summary>
-    /// Базовый класс конкретной реализации для анализа файла с текстом
+    /// Расширение файла-источника текста (без точки)
     /// </summary>
-    public abstract class FileParserBase
+    public abstract string FileExtension { get; }
+
+    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private CSVFiller _csvFiller = new();
+
+    public void Execute(FileInfo fileInfo)
     {
-        /// <summary>
-        /// Расширение файла-источника текста (без точки)
-        /// </summary>
-        public abstract string FileExtension { get; }
+        ArgumentNullException.ThrowIfNull(fileInfo);
 
-        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-        private CSVFiller _csvFiller = new();
-
-        public void Execute(FileInfo fileInfo)
+        try
         {
-            ArgumentNullException.ThrowIfNull(fileInfo);
-
-            try
-            {
-                _csvFiller.StartFilling(fileInfo);
-                Parse(fileInfo);
-                _csvFiller.FillAll(needSorting: true);
-            }
-            finally
-            {
-                _csvFiller.StopFilling();
-            }  
+            _csvFiller.StartFilling(fileInfo);
+            Parse(fileInfo);
+            _csvFiller.FillAll(needSorting: true);
         }
+        finally
+        {
+            _csvFiller.StopFilling();
+        }  
+    }
 
-        protected abstract void Parse(FileInfo fileInfo);
+    protected abstract void Parse(FileInfo fileInfo);
     
-        protected void AddWord(Word word)
-        {
-            ArgumentNullException.ThrowIfNull(word);
+    protected void AddWord(Word word)
+    {
+        ArgumentNullException.ThrowIfNull(word);
             
-            _csvFiller.AddWord(word);
-        }
+        _csvFiller.AddWord(word);
     }
 }

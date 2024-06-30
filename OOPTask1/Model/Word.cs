@@ -1,50 +1,49 @@
-﻿namespace OOPTask1.Model
+﻿namespace OOPTask1.Model;
+
+public class Word
 {
-    public class Word
+    public string Value { get; }
+
+    public Word(string value)
     {
-        public string Value { get; }
+        ArgumentException.ThrowIfNullOrEmpty(value);
 
-        public Word(string value)
+        if (!value.All(char.IsLetterOrDigit))
         {
-            ArgumentException.ThrowIfNullOrEmpty(value);
-
-            if (!value.All(char.IsLetterOrDigit))
-            {
-                throw new ArgumentException("Must contains only letters or digits!", nameof(value));
-            }
-
-            Value = value;
+            throw new ArgumentException("Must contains only letters or digits!", nameof(value));
         }
 
-        public override string ToString()
+        Value = value;
+    }
+
+    public override string ToString()
+    {
+        return Value;
+    }
+
+    public bool CustomEquals(object? obj)
+    {
+        if (obj == null)
         {
-            return Value;
+            return false;
         }
 
-        public override bool Equals(object? obj)
+        if (obj is Word word)
         {
-            if (obj == null)
-            {
-                return false;
-            }
-
-            if (obj is Word word)
-            {
-                return word.Value.Equals(Value);
-            }
-            else if (obj is string str)
-            {
-                return str.Equals(Value);
-            }
-            else
-            {
-                return false;
-            }
+            return word.Value.Equals(Value);
         }
-
-        public override int GetHashCode()
+        else if (obj is string str)
         {
-            return Value.GetHashCode();
+            return str.Equals(Value);
         }
+        else
+        {
+            return false;
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
     }
 }

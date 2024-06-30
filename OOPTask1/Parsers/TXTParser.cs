@@ -1,57 +1,53 @@
 ﻿using OOPTask1.Model;
 using System.Text;
 
-namespace OOPTask1.Parsers
+namespace OOPTask1.Parsers;
+
+public sealed class TXTParser : FileParserBase
 {
-    /// <summary>
-    /// Реализация анализа текста файла txt
-    /// </summary>
-    public sealed class TXTParser : FileParserBase
+    /// <inheritdoc />
+    public override string FileExtension => "txt";
+
+    /// <inheritdoc />
+    protected override void Parse(FileInfo textFile)
     {
-        /// <inheritdoc />
-        public override string FileExtension => "txt";
-
-        /// <inheritdoc />
-        protected override void Parse(FileInfo textFile)
+        using (var fs = new FileStream(textFile.FullName, FileMode.Open, FileAccess.Read))
         {
-            using (var fs = new FileStream(textFile.FullName, FileMode.Open, FileAccess.Read))
+            using (var sr = new StreamReader(fs))
             {
-                using (var sr = new StreamReader(fs))
+                var sb = new StringBuilder();
+
+                while (!sr.EndOfStream)
                 {
-                    var sb = new StringBuilder();
+                    var letterIndex = sr.Read();
 
-                    while (!sr.EndOfStream)
+                    if (letterIndex == -1)
                     {
-                        var letterIndex = sr.Read();
+                        break;
+                    }
 
-                        if (letterIndex == -1)
+                    var letter = (char)letterIndex;
+
+                    if (char.IsControl(letter))
+                    {
+                        continue;
+                    }                 
+
+                    if (!char.IsLetterOrDigit(letter))
+                    {
+                        var wordStr = sb.ToString();
+
+                        if (!string.IsNullOrEmpty(wordStr))
                         {
-                            break;
-                        }
+                            var word = new Word(wordStr);
+                            AddWord(word);
+                        }   
 
-                        var letter = (char)letterIndex;
-
-                        if (char.IsControl(letter))
-                        {
-                            continue;
-                        }                 
-
-                        if (!char.IsLetterOrDigit(letter))
-                        {
-                            var wordStr = sb.ToString();
-
-                            if (!string.IsNullOrEmpty(wordStr))
-                            {
-                                var word = new Word(wordStr);
-                                AddWord(word);
-                            }   
-
-                            sb.Clear();
-                        }
-                        else
-                        {
-                            sb.Append(letter);
-                        }
+                        sb.Clear();
+                    }
+                    else
+                    {
+                        sb.Append(letter);
                     }
                 }
             }

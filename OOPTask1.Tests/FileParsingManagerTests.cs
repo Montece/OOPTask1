@@ -1,28 +1,30 @@
-﻿using OOPTask1.Parsers;
-using System.IO;
+﻿using System.IO;
+using OOPTask1.Parsers;
 using Xunit;
 
 namespace OOPTask1.Tests;
 
-public sealed class ParsingManagerTests
+public sealed class FileParsingManagerTests
 {
     [Fact]
-    public void Register_Success()
+    public void FileParsingManager_Register()
     {
-        var parsingManager = new ParsingManager();
-        var txtParser = new TXTParser();
+        var parsingManager = new FileParsingManager();
+        var streamParser = new StreamParser();
+        var txtParser = new TxtParser(streamParser);
         parsingManager.Register(txtParser);
 
         var result = parsingManager.Execute(new FileInfo("StringBuilder.txt"));
-
+        
         Assert.True(result);
     }
 
     [Fact]
-    public void Unregister_Success()
+    public void FileParsingManager_Unregister()
     {
-        var parsingManager = new ParsingManager();
-        var txtParser = new TXTParser();
+        var parsingManager = new FileParsingManager();
+        var streamParser = new StreamParser();
+        var txtParser = new TxtParser(streamParser);
         parsingManager.Register(txtParser);
         parsingManager.Unregister(txtParser);
 
@@ -32,13 +34,15 @@ public sealed class ParsingManagerTests
     }
 
     [Theory]
-    [InlineData(["StringBuilder.txt", "StringBuilder.csv", "StringBuilder;0.0216;2.165%"])]
+    [InlineData(["StringBuilder.txt", "output.csv", "StringBuilder;0.0216;2.165%"])]
     public void ExecuteTXTParserTest(string inputFilename, string outputFilename, string assertValue)
     {
         var fileInfo = new FileInfo(Path.Combine(Environment.CurrentDirectory, inputFilename));
 
-        var parsingManager = new ParsingManager();
-        parsingManager.Register(new TXTParser());
+        var parsingManager = new FileParsingManager();
+        var streamParser = new StreamParser();
+        var txtParser = new TxtParser(streamParser);
+        parsingManager.Register(txtParser);
         parsingManager.Execute(fileInfo);
 
         var firstLine = File.ReadAllLines(outputFilename).FirstOrDefault();

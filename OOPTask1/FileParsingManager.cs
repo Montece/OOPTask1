@@ -3,19 +3,16 @@ using OOPTask1.Abstract;
 
 namespace OOPTask1;
 
-/// <summary>
-/// Система с различными анализаторами текста
-/// </summary>
-public sealed class ParsingManager : IParsingManager
+public sealed class FileParsingManager : IParsingManager
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private readonly List<FileParserBase> _parsers = new();
+    private readonly List<IFileParser> _parsers = new();
 
-    public bool Register(FileParserBase parser)
+    public bool Register(IFileParser parser)
     {
         ArgumentNullException.ThrowIfNull(parser);
 
-        if (_parsers.Contains(parser))
+        if (_parsers.Any(p => p.FileExtension.Equals(parser.FileExtension)))
         {
             return false;
         }
@@ -25,16 +22,16 @@ public sealed class ParsingManager : IParsingManager
         return true;
     }
 
-    public bool Unregister(FileParserBase parser)
+    public bool Unregister(IFileParser parser)
     {
         ArgumentNullException.ThrowIfNull(parser);
 
-        if (!_parsers.Contains(parser))
+        if (!_parsers.All(p => p.FileExtension.Equals(parser.FileExtension)))
         {
             return false;
         }
 
-        _parsers.Remove(parser);
+        _parsers.RemoveAll(p => p.FileExtension.Equals(parser.FileExtension));
 
         return true;
     }
@@ -42,7 +39,7 @@ public sealed class ParsingManager : IParsingManager
     public bool Execute(FileInfo fileInfo)
     {
         ArgumentNullException.ThrowIfNull(fileInfo);
-
+        
         try
         {
             if (string.IsNullOrEmpty(fileInfo.Extension))
@@ -50,7 +47,7 @@ public sealed class ParsingManager : IParsingManager
                 throw new ArgumentException("File doesn't have extension", nameof(fileInfo));
             }
 
-            var fileExtension = fileInfo.Extension.Substring(1);
+            var fileExtension = fileInfo.Extension[1..];
             var parsers = _parsers.Where(p => p.FileExtension.Equals(fileExtension)).ToList();
 
             if (parsers.Count == 0)
@@ -60,7 +57,7 @@ public sealed class ParsingManager : IParsingManager
 
             foreach (var parser in parsers)
             {
-                parser.Execute(fileInfo);
+                parser.Parse(fileInfo);
             }
 
             return true;

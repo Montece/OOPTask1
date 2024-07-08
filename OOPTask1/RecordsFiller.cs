@@ -1,35 +1,33 @@
 ﻿using NLog;
+using NLog.Filters;
+using OOPTask1.Abstract;
 using OOPTask1.Model;
 using System.Text;
 
 namespace OOPTask1;
 
-public sealed class CSVFiller
+public sealed class RecordsFiller
 {
     public bool IsFilling => _isFilling;
     public IReadOnlyCollection<Record> Records => _records;
 
-    private const string TARGET_FILE_EXTENSION = "csv";
+    private const string TARGET_FILENAME = "result.csv";
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private bool _isFilling = false;
-    private FileStream? _csvStream = null;
+    private StreamWriter? _stream;
     private ulong _allWordsCount = 0;
     private List<Record> _records = new(128);
 
-    public bool StartFilling(FileInfo fileInfo)
+    public bool StartFilling(StreamWriter stream)
     {
         if (_isFilling)
         {
             return false;
         }
 
-        ArgumentNullException.ThrowIfNull(fileInfo);
-        ArgumentNullException.ThrowIfNull(fileInfo.DirectoryName);
+        ArgumentNullException.ThrowIfNull(stream);
 
-        var filenameWithoutExtension = Path.Combine(fileInfo.DirectoryName, Path.GetFileNameWithoutExtension(fileInfo.Name));
-
-        _csvStream = new FileStream($"{filenameWithoutExtension}.{TARGET_FILE_EXTENSION}", FileMode.Create, FileAccess.Write);
-
+        _stream = stream;
         _isFilling = true;
 
         return true;
@@ -80,7 +78,7 @@ public sealed class CSVFiller
     {
         ArgumentNullException.ThrowIfNull(record);
 
-        if (!IsFilling || _allWordsCount == 0 || _csvStream is null)
+        if (!IsFilling || _allWordsCount == 0 || _stream is null)
         {
             return false;
         }
@@ -92,11 +90,9 @@ public sealed class CSVFiller
         var frequencyInPercentsText = $"{frequencyInPercents.ToString("0.000").Replace(',', '.')}%";
         var splitChar = ';';
         var line = $"{record.Word}{splitChar}{frequencyText}{splitChar}{frequencyInPercentsText}{Environment.NewLine}";
-
-        var data = Encoding.UTF8.GetBytes(line);
-
-        _csvStream.Write(data, 0, data.Length);
-        _csvStream.Flush();
+        
+        _stream.WriteLine(line);
+        _stream.Flush();
 
         _logger.Info($"Сделана запись '{line}'");
 
@@ -115,15 +111,10 @@ public sealed class CSVFiller
             return false;
         }
 
-        if (_csvStream is null)
-        {
-            return false;
-        }
-
         try
         {
-            _csvStream.Close();
-            _csvStream.Dispose();
+            /*stream?.Close();
+            _stream?.Dispose();*/
         }
         catch (Exception ex)
         {
@@ -136,14 +127,21 @@ public sealed class CSVFiller
         return true;
     }
 
-    ~CSVFiller()
+    ~RecordsFiller()
     {
         if (!_isFilling)
         {
             return;
         }
 
-        _csvStream?.Close();
-        _csvStream?.Dispose();
+        try
+        {
+            _stream?.Close();
+            _stream?.Dispose();
+        }
+        catch (Exception ex)
+        {
+            // Ignore
+        }
     }
 }

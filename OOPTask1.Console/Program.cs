@@ -1,5 +1,6 @@
 ﻿using NLog;
 using OOPTask1.Parsers;
+using System.Reflection.PortableExecutable;
 
 namespace OOPTask1.Console;
 
@@ -21,11 +22,10 @@ internal class Program
                 return;
             }
 
-            var fileinfo = new FileInfo(args[0]);
-
-            var parsingManager = new ParsingManager();
-            parsingManager.Register(new TXTParser());
-            parsingManager.Execute(fileinfo);
+            var fileInfo = new FileInfo(args[0]);
+            var parsingManager = new FileParsingManager();
+            parsingManager.Register(new TxtParser(new StreamParser()));
+            parsingManager.Execute(fileInfo);
         }
         catch (Exception ex)
         {

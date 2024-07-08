@@ -10,7 +10,7 @@ public sealed partial class MainWindow : Window
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private FileInfo? _fileInfo;
-    private ParsingManager? _parsingManager;
+    private FileParsingManager? _parsingManager;
 
     public MainWindow()
     {
@@ -51,8 +51,8 @@ public sealed partial class MainWindow : Window
 
         try
         {
-            _parsingManager = new ParsingManager();
-            _parsingManager.Register(new TXTParser());
+            _parsingManager = new FileParsingManager();
+            _parsingManager.Register(new TxtParser(new StreamParser()));
             var result = _parsingManager.Execute(_fileInfo);
             MessageBox.Show($"Завершено {(result ? "успешно" : "с ошибками")}.");
         }

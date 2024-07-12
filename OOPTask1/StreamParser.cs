@@ -1,5 +1,4 @@
-﻿using NLog;
-using OOPTask1.Abstract;
+﻿using OOPTask1.Abstract;
 using OOPTask1.Model;
 using System.Text;
 
@@ -7,7 +6,6 @@ namespace OOPTask1;
 
 public sealed class StreamParser : IStreamParser
 {
-    private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private readonly RecordsFiller _csvFiller = new();
 
     public void Parse(StreamReader sourceStream, StreamWriter targetStream)
@@ -29,7 +27,7 @@ public sealed class StreamParser : IStreamParser
 
     private void Analyse(StreamReader sourceStream)
     {
-        var sb = new StringBuilder();
+        var stringBuilder = new StringBuilder();
 
         while (!sourceStream.EndOfStream)
         {
@@ -49,7 +47,7 @@ public sealed class StreamParser : IStreamParser
 
             if (!char.IsLetterOrDigit(letter))
             {
-                var wordStr = sb.ToString();
+                var wordStr = stringBuilder.ToString();
 
                 if (!string.IsNullOrEmpty(wordStr))
                 {
@@ -57,11 +55,11 @@ public sealed class StreamParser : IStreamParser
                     AddWord(word);
                 }
 
-                sb.Clear();
+                stringBuilder.Clear();
             }
             else
             {
-                sb.Append(letter);
+                stringBuilder.Append(letter);
             }
         }
     }

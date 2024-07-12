@@ -1,6 +1,5 @@
 ﻿using NLog;
 using OOPTask1.Parsers;
-using System.Reflection.PortableExecutable;
 
 namespace OOPTask1.Console;
 
@@ -8,7 +7,7 @@ internal class Program
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-    private static void Main(string[] args)
+    private static void Main(string[] commandLineArguments)
     {
         System.Console.Title = "OOPTask1.Console";
 
@@ -16,13 +15,13 @@ internal class Program
         {
             _logger.Info("Программа запущена.");
 
-            if (args.Length == 0)
+            if (commandLineArguments.Length == 0)
             {
                 _logger.Info("Не заданы аргументы!");
                 return;
             }
 
-            var fileInfo = new FileInfo(args[0]);
+            var fileInfo = new FileInfo(commandLineArguments[0]);
             var parsingManager = new FileParsingManager();
             parsingManager.Register(new TxtParser(new StreamParser()));
             parsingManager.Execute(fileInfo);

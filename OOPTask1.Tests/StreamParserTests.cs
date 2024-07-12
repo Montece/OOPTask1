@@ -16,6 +16,6 @@ public sealed class StreamParserTests
         streamParser.Parse(reader.Reader, writer.Writer);
 
         var lines = writer.GetText();
-        Assert.Equal("456;0.5000;0.005%", lines[1]);
+        Assert.Equal("456,0.5000,0.005%", lines[1]);
     }
 }

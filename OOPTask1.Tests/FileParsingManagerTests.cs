@@ -34,8 +34,8 @@ public sealed class FileParsingManagerTests
     }
 
     [Theory]
-    [InlineData(["StringBuilder.txt", "output.csv", "StringBuilder;0.0216;2.165%"])]
-    public void ExecuteTXTParserTest(string inputFilename, string outputFilename, string assertValue)
+    [InlineData(["StringBuilder.txt", "output.csv", "в,0.0308,0.000%"])]
+    public void ExecuteTXTParserTest(string inputFilename, string outputFilename, string expectedValue)
     {
         var fileInfo = new FileInfo(Path.Combine(Environment.CurrentDirectory, inputFilename));
 
@@ -46,8 +46,7 @@ public sealed class FileParsingManagerTests
         parsingManager.Execute(fileInfo);
 
         var firstLine = File.ReadAllLines(outputFilename).FirstOrDefault();
-        var startsWith = firstLine.StartsWith("в;");
 
-        Assert.True(startsWith);
+        Assert.Equal(expectedValue, firstLine);
     }
 }

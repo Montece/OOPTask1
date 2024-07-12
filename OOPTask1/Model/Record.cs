@@ -3,12 +3,12 @@
 /// <summary>
 /// Запись с информацией о слове и частоте его появления
 /// </summary>
-public class Record
+public sealed class Record
 {
     public Word Word { get; }
     public ulong Count { get; set; }
 
-    public Record(Word word, ulong count)
+    public Record(Word? word, ulong count)
     {
         ArgumentNullException.ThrowIfNull(word);
 

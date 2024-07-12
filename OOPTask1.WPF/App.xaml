@@ -1,7 +1,6 @@
 ﻿<Application x:Class="OOPTask1.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:OOPTask1.WPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

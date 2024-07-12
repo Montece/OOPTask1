@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace OOPTask1.WPF;
 
-public sealed partial class MainWindow : Window
+public sealed partial class MainWindow
 {
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private FileInfo? _fileInfo;
@@ -29,16 +29,20 @@ public sealed partial class MainWindow : Window
 
     private void ChooseFile_Button_Click(object sender, RoutedEventArgs e)
     {
-        var ofd = new OpenFileDialog()
+        var openFileDialog = new OpenFileDialog()
         {
             Multiselect = false
         };
-            
-        if (ofd.ShowDialog().Value)
+
+        var result = openFileDialog.ShowDialog();
+
+        if (result == null || !result.Value)
         {
-            _fileInfo = new(ofd.FileName);
-            _parsingManager = null;
+            return;
         }
+
+        _fileInfo = new(openFileDialog.FileName);
+        _parsingManager = null;
     }
 
     private void Execute_Button_Click(object sender, RoutedEventArgs e)

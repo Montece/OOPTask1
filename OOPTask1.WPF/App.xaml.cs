@@ -1,7 +1,3 @@
-﻿using System.Windows;
+﻿namespace OOPTask1.WPF;
 
-namespace OOPTask1.WPF;
-
-public sealed partial class App : Application
-{
-}
+public sealed partial class App;

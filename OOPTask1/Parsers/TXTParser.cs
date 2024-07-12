@@ -8,11 +8,11 @@ public sealed class TxtParser(IStreamParser streamParser) : IFileParser
 
     public void Parse(FileInfo fileInfo)
     {
-        using var fs = fileInfo.OpenRead();
-        using var fr = new StreamReader(fs);
+        using var fileStream = fileInfo.OpenRead();
+        using var fileReader = new StreamReader(fileStream);
 
         using var csv = File.Create("output.csv");
         using var csvWriter = new StreamWriter(csv);
-        streamParser.Parse(fr, csvWriter);
+        streamParser.Parse(fileReader, csvWriter);
     }
 }

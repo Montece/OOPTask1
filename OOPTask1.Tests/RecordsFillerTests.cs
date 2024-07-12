@@ -72,7 +72,7 @@ namespace OOPTask1.Tests
                 recordsFiller.StartFilling(fileWriter.Writer);
                 recordsFiller.AddWord(new(testWord));
                 var record = recordsFiller.TryGetRecord(new(testWord));
-                Assert.Equal(testWord, record.Word.Value);
+                Assert.Equal(testWord, record?.Word.Value);
             }
             finally
             {
@@ -85,7 +85,7 @@ namespace OOPTask1.Tests
         {
             var recordsFiller = new RecordsFiller();
             var testWord = "Hello";
-            var expectedRecord = "Hello;1.0000;0.010%";
+            var expectedRecord = "Hello,1.0000,0.010%";
 
             try
             {

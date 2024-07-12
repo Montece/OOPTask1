@@ -1,10 +1,10 @@
 ﻿namespace OOPTask1.Model;
 
-public class Word
+public sealed class Word
 {
     public string Value { get; }
 
-    public Word(string value)
+    public Word(string? value)
     {
         ArgumentException.ThrowIfNullOrEmpty(value);
 
@@ -21,20 +21,20 @@ public class Word
         return Value;
     }
 
-    public bool CustomEquals(object? obj)
+    public bool CustomEquals(object? targetObject)
     {
-        if (obj == null)
+        if (targetObject == null)
         {
             return false;
         }
 
-        if (obj is Word word)
+        if (targetObject is Word word)
         {
             return word.Value.Equals(Value);
         }
-        else if (obj is string str)
+        else if (targetObject is string targetString)
         {
-            return str.Equals(Value);
+            return targetString.Equals(Value);
         }
         else
         {

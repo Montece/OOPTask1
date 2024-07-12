@@ -1,8 +1,5 @@
 ﻿using NLog;
-using NLog.Filters;
-using OOPTask1.Abstract;
 using OOPTask1.Model;
-using System.Text;
 
 namespace OOPTask1;
 
@@ -11,11 +8,10 @@ public sealed class RecordsFiller
     public bool IsFilling => _isFilling;
     public IReadOnlyCollection<Record> Records => _records;
 
-    private const string TARGET_FILENAME = "result.csv";
     private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-    private bool _isFilling = false;
+    private bool _isFilling;
     private StreamWriter? _stream;
-    private ulong _allWordsCount = 0;
+    private ulong _allWordsCount;
     private List<Record> _records = new(128);
 
     public bool StartFilling(StreamWriter stream)
@@ -56,7 +52,7 @@ public sealed class RecordsFiller
     {
         ArgumentNullException.ThrowIfNull(word);
 
-        var record = _records.FirstOrDefault(r => r.Word != null && r.Word.CustomEquals(word));
+        var record = _records.FirstOrDefault(r => r.Word.CustomEquals(word));
 
         return record;
     }
@@ -74,13 +70,13 @@ public sealed class RecordsFiller
         }
     }
 
-    private bool Fill(Record record)
+    private void Fill(Record record)
     {
         ArgumentNullException.ThrowIfNull(record);
 
         if (!IsFilling || _allWordsCount == 0 || _stream is null)
         {
-            return false;
+            return;
         }
 
         var frequency = record.GetFrequency(_allWordsCount);
@@ -88,15 +84,13 @@ public sealed class RecordsFiller
 
         var frequencyText = frequency.ToString("0.0000").Replace(',', '.');
         var frequencyInPercentsText = $"{frequencyInPercents.ToString("0.000").Replace(',', '.')}%";
-        var splitChar = ';';
-        var line = $"{record.Word}{splitChar}{frequencyText}{splitChar}{frequencyInPercentsText}{Environment.NewLine}";
+        var splitChar = ',';
+        var line = $"{record.Word}{splitChar}{frequencyText}{splitChar}{frequencyInPercentsText}";
         
         _stream.WriteLine(line);
         _stream.Flush();
 
         _logger.Info($"Сделана запись '{line}'");
-
-        return true;
     }
 
     private void SortWords()
@@ -108,17 +102,6 @@ public sealed class RecordsFiller
     {
         if (!_isFilling)
         {
-            return false;
-        }
-
-        try
-        {
-            /*stream?.Close();
-            _stream?.Dispose();*/
-        }
-        catch (Exception ex)
-        {
-            _logger.Error(ex);
             return false;
         }
 
@@ -139,7 +122,7 @@ public sealed class RecordsFiller
             _stream?.Close();
             _stream?.Dispose();
         }
-        catch (Exception ex)
+        catch
         {
             // Ignore
         }
